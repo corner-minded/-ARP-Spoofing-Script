@@ -1,8 +1,8 @@
 from scapy.all import *
 import time
 
-target_ip = "10.15.115.35"   # Windows target
-gateway_ip = "10.15.1.1"     # Gateway
+target_ip = "10.15.50.228"   # Windows target
+gateway_ip = "10.15.0.1"     # Gateway
 
 target_mac = getmacbyip(target_ip)
 gateway_mac = getmacbyip(gateway_ip)
