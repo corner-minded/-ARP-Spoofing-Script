@@ -1,0 +1,16 @@
+sudo apt update
+
+
+sudo apt install scapy
+
+
+arp -n *for kali mac address
+
+sudo sh -c 'echo 1 > /proc/sys/net/ipv4/ip_forward'
+
+cat /proc/sys/net/ipv4/ip_forward *check
+
+Output 0: Forwarding is disabled.
+Output 1: Forwarding is enabled (no action needed).
+
+sudo python3 ARP_Spoofing_Script.py
