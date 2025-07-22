@@ -15,13 +15,13 @@ Output 1: Forwarding is enabled (no action needed).
 
 sudo python3 ARP_Spoofing_Script.py
 
-ip.addr == 10.15.50.228
+sudo wireshark -k -i eth0 -f "ip.addr == 10.15.50.228"
 
 Optional-
 
-Only HTTP traffic: ip.addr == 10.15.50.228 && tcp.port == 80
+Only HTTP traffic: sudo wireshark -k -i eth0 -f "ip.addr == 10.15.50.228 && tcp.port == 80"
 
-Only DNS queries: ip.addr == 10.15.50.228 && udp.port == 53
+Only DNS queries: sudo wireshark -k -i eth0 -f "ip.addr == 10.15.50.228 && udp.port == 53"
 
-Exclude ARP/ICMP (reduce noise): ip.addr == 10.15.50.228 && !arp && !icmp
+Exclude ARP/ICMP (reduce noise): sudo wireshark -k -i eth0 -f "ip.addr == 10.15.50.228 && !arp && !icmp"
 
