@@ -4,7 +4,7 @@ sudo apt update
 sudo apt install scapy
 
 
-arp -n *for kali gatway address
+arp -n *for kali gatway mac address
 
 sudo sh -c 'echo 1 > /proc/sys/net/ipv4/ip_forward'   or    echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward  or   sudo sysctl -w net.ipv4.ip_forward=1
 
