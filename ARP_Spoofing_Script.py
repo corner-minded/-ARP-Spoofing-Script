@@ -5,7 +5,7 @@ import sys
 
 # Replace with your actual IPs and MACs
 target_ip = "10.15.4.29"       # IP of Windows 10 VM
-gateway_ip = "10.0.2.1"       # Gateway IP (your router)
+gateway_ip = "10.15.0.1"       # Gateway IP (your router)
 interface = "eth0"            # Interface on Kali (e.g., eth0, wlan0)
 
 def get_mac(ip):
